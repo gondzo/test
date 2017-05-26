@@ -1,0 +1,65 @@
+swagger: '2.0'
+info:
+  description: api info description
+  version: '2016-11-22T22:39:14Z'
+  title: doc
+  x-bar: api info x-bar
+host: rznaap68yi.execute-api.ap-southeast-1.amazonaws.com
+basePath: /test
+schemes:
+  - https
+paths:
+  /:
+    get:
+      description: Method description.
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: 200 response
+          schema:
+            $ref: '#/definitions/Empty'
+      x-example: x- Method example
+    x-bar: resource x-bar
+definitions:
+  Empty:
+    type: object
+    title: Empty Schema
+x-amazon-apigateway-documentation:
+  version: 1.0.0
+  createdDate: '2016-11-22T22:41:40Z'
+  documentationParts:
+    - location:
+        type: API
+      properties:
+        description: api description
+        foo: api foo
+        x-bar: api x-bar
+        info:
+          description: api info description
+          version: api info version
+          foo: api info foo
+          x-bar: api info x-bar
+    - location:
+        type: METHOD
+        method: GET
+      properties:
+        description: Method description.
+        x-example: x- Method example
+        foo: Method foo
+        info:
+          version: method info version
+          description: method info description
+          foo: method info foo
+    - location:
+        type: RESOURCE
+      properties:
+        description: resource description
+        foo: resource foo
+        x-bar: resource x-bar
+        info:
+          description: resource info description
+          version: resource info version
+          foo: resource info foo
+          x-bar: resource info x-bar
+x-bar: api x-bar
