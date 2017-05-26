@@ -1,65 +1,470 @@
-swagger: '2.0'
+---
+swagger: "2.0"
 info:
-  description: api info description
-  version: '2016-11-22T22:39:14Z'
-  title: doc
-  x-bar: api info x-bar
-host: rznaap68yi.execute-api.ap-southeast-1.amazonaws.com
-basePath: /test
+  description: "Your first API with Amazon API Gateway. This is a sample API that\
+    \ integrates via HTTP with our demo Pet Store endpoints"
+  version: "2017-05-26T21:16:11Z"
+  title: "PetStore"
+host: "iqtpvrecb9.execute-api.us-east-1.amazonaws.com"
+basePath: "/a"
 schemes:
-  - https
+- "https"
 paths:
   /:
     get:
-      description: Method description.
+      tags:
+      - "pets"
+      description: "PetStore HTML web page containing API usage information"
+      consumes:
+      - "application/json"
       produces:
-        - application/json
+      - "text/html"
       responses:
-        '200':
-          description: 200 response
+        200:
+          description: "Successful operation"
+          headers:
+            Content-Type:
+              type: "string"
+              description: "Media type of request"
+      x-amazon-apigateway-integration:
+        responses:
+          default:
+            statusCode: "200"
+            responseParameters:
+              method.response.header.Content-Type: "'text/html'"
+            responseTemplates:
+              text/html: "<html>\n    <head>\n        <style>\n        body {\n  \
+                \          color: #333;\n            font-family: Sans-serif;\n  \
+                \          max-width: 800px;\n            margin: auto;\n        }\n\
+                \        </style>\n    </head>\n    <body>\n        <h1>Welcome to\
+                \ your Pet Store API</h1>\n        <p>\n            You have succesfully\
+                \ deployed your first API. You are seeing this HTML page because the\
+                \ <code>GET</code> method to the root resource of your API returns\
+                \ this content as a Mock integration.\n        </p>\n        <p>\n\
+                \            The Pet Store API contains the <code>/pets</code> and\
+                \ <code>/pets/{petId}</code> resources. By making a <a href=\"/$context.stage/pets/\"\
+                \ target=\"_blank\"><code>GET</code> request</a> to <code>/pets</code>\
+                \ you can retrieve a list of Pets in your API. If you are looking\
+                \ for a specific pet, for example the pet with ID 1, you can make\
+                \ a <a href=\"/$context.stage/pets/1\" target=\"_blank\"><code>GET</code>\
+                \ request</a> to <code>/pets/1</code>.\n        </p>\n        <p>\n\
+                \            You can use a REST client such as <a href=\"https://www.getpostman.com/\"\
+                \ target=\"_blank\">Postman</a> to test the <code>POST</code> methods\
+                \ in your API to create a new pet. Use the sample body below to send\
+                \ the <code>POST</code> request:\n        </p>\n        <pre>\n{\n\
+                \    \"type\" : \"cat\",\n    \"price\" : 123.11\n}\n        </pre>\n\
+                \    </body>\n</html>"
+        requestTemplates:
+          application/json: "{\"statusCode\": 200}"
+        passthroughBehavior: "when_no_match"
+        type: "mock"
+  /pets:
+    get:
+      tags:
+      - "pets"
+      summary: "List all pets"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "type"
+        in: "query"
+        description: "The type of pet to retrieve"
+        required: false
+        type: "string"
+      - name: "page"
+        in: "query"
+        description: "Page number of results to return."
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "Successful operation"
           schema:
-            $ref: '#/definitions/Empty'
-      x-example: x- Method example
-    x-bar: resource x-bar
+            $ref: "#/definitions/Pets"
+          headers:
+            Access-Control-Allow-Origin:
+              type: "string"
+              description: "URI that may access the resource"
+      x-amazon-apigateway-integration:
+        responses:
+          default:
+            statusCode: "200"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+        requestParameters:
+          integration.request.querystring.page: "method.request.querystring.page"
+          integration.request.querystring.type: "method.request.querystring.type"
+        uri: "http://petstore-demo-endpoint.execute-api.com/petstore/pets"
+        passthroughBehavior: "when_no_match"
+        httpMethod: "GET"
+        type: "http"
+    post:
+      tags:
+      - "pets"
+      summary: "Create a pet"
+      operationId: "CreatePet"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "NewPet"
+        required: true
+        schema:
+          $ref: "#/definitions/NewPet"
+      responses:
+        200:
+          description: "Successful operation"
+          schema:
+            $ref: "#/definitions/NewPetResponse"
+          headers:
+            Access-Control-Allow-Origin:
+              type: "string"
+              description: "URI that may access the resource"
+      x-amazon-apigateway-integration:
+        responses:
+          default:
+            statusCode: "200"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+        uri: "http://petstore-demo-endpoint.execute-api.com/petstore/pets"
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        type: "http"
+    options:
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "Successful operation"
+          schema:
+            $ref: "#/definitions/Empty"
+          headers:
+            Access-Control-Allow-Origin:
+              type: "string"
+              description: "URI that may access the resource"
+            Access-Control-Allow-Methods:
+              type: "string"
+              description: "Method or methods allowed when accessing the resource"
+            Access-Control-Allow-Headers:
+              type: "string"
+              description: "Used in response to a preflight request to indicate which\
+                \ HTTP headers can be used when making the request."
+      x-amazon-apigateway-integration:
+        responses:
+          default:
+            statusCode: "200"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Methods: "'POST,GET,OPTIONS'"
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+        requestTemplates:
+          application/json: "{\"statusCode\": 200}"
+        passthroughBehavior: "when_no_match"
+        type: "mock"
+  /pets/{petId}:
+    get:
+      tags:
+      - "pets"
+      summary: "Info for a specific pet"
+      operationId: "GetPet"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "petId"
+        in: "path"
+        description: "The id of the pet to retrieve"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Successful operation"
+          schema:
+            $ref: "#/definitions/Pet"
+          headers:
+            Access-Control-Allow-Origin:
+              type: "string"
+              description: "URI that may access the resource"
+      x-amazon-apigateway-integration:
+        responses:
+          default:
+            statusCode: "200"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+        requestParameters:
+          integration.request.path.petId: "method.request.path.petId"
+        uri: "http://petstore-demo-endpoint.execute-api.com/petstore/pets/{petId}"
+        passthroughBehavior: "when_no_match"
+        httpMethod: "GET"
+        type: "http"
+    options:
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "petId"
+        in: "path"
+        description: "The id of the pet to retrieve"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Successful operation"
+          schema:
+            $ref: "#/definitions/Empty"
+          headers:
+            Access-Control-Allow-Origin:
+              type: "string"
+              description: "URI that may access the resource"
+            Access-Control-Allow-Methods:
+              type: "string"
+              description: "Method or methods allowed when accessing the resource"
+            Access-Control-Allow-Headers:
+              type: "string"
+              description: "Used in response to a preflight request to indicate which\
+                \ HTTP headers can be used when making the request."
+      x-amazon-apigateway-integration:
+        responses:
+          default:
+            statusCode: "200"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS'"
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+        requestTemplates:
+          application/json: "{\"statusCode\": 200}"
+        passthroughBehavior: "when_no_match"
+        type: "mock"
 definitions:
+  Pets:
+    type: "array"
+    items:
+      $ref: "#/definitions/Pet"
   Empty:
-    type: object
-    title: Empty Schema
+    type: "object"
+  NewPetResponse:
+    type: "object"
+    properties:
+      pet:
+        $ref: "#/definitions/Pet"
+      message:
+        type: "string"
+  Pet:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      type:
+        type: "string"
+      price:
+        type: "number"
+  NewPet:
+    type: "object"
+    properties:
+      type:
+        $ref: "#/definitions/PetType"
+      price:
+        type: "number"
+  PetType:
+    type: "string"
+    enum:
+    - "dog"
+    - "cat"
+    - "fish"
+    - "bird"
+    - "gecko"
 x-amazon-apigateway-documentation:
-  version: 1.0.0
-  createdDate: '2016-11-22T22:41:40Z'
+  version: "a"
+  createdDate: "2017-05-26T21:16:23Z"
   documentationParts:
-    - location:
-        type: API
-      properties:
-        description: api description
-        foo: api foo
-        x-bar: api x-bar
-        info:
-          description: api info description
-          version: api info version
-          foo: api info foo
-          x-bar: api info x-bar
-    - location:
-        type: METHOD
-        method: GET
-      properties:
-        description: Method description.
-        x-example: x- Method example
-        foo: Method foo
-        info:
-          version: method info version
-          description: method info description
-          foo: method info foo
-    - location:
-        type: RESOURCE
-      properties:
-        description: resource description
-        foo: resource foo
-        x-bar: resource x-bar
-        info:
-          description: resource info description
-          version: resource info version
-          foo: resource info foo
-          x-bar: resource info x-bar
-x-bar: api x-bar
+  - location:
+      type: "API"
+    properties:
+      info:
+        description: "Your first API with Amazon API Gateway. This is a sample API\
+          \ that integrates via HTTP with our demo Pet Store endpoints"
+  - location:
+      type: "METHOD"
+      method: "GET"
+    properties:
+      tags:
+      - "pets"
+      description: "PetStore HTML web page containing API usage information"
+  - location:
+      type: "METHOD"
+      path: "/pets/{petId}"
+      method: "GET"
+    properties:
+      tags:
+      - "pets"
+      summary: "Info for a specific pet"
+  - location:
+      type: "METHOD"
+      path: "/pets"
+      method: "GET"
+    properties:
+      tags:
+      - "pets"
+      summary: "List all pets"
+  - location:
+      type: "METHOD"
+      path: "/pets"
+      method: "POST"
+    properties:
+      tags:
+      - "pets"
+      summary: "Create a pet"
+  - location:
+      type: "PATH_PARAMETER"
+      path: "/pets/{petId}"
+      method: "GET"
+      name: "petId"
+    properties:
+      description: "The id of the pet to retrieve"
+  - location:
+      type: "PATH_PARAMETER"
+      path: "/pets/{petId}"
+      method: "OPTIONS"
+      name: "petId"
+    properties:
+      description: "The id of the pet to retrieve"
+  - location:
+      type: "QUERY_PARAMETER"
+      path: "/pets"
+      method: "GET"
+      name: "page"
+    properties:
+      description: "Page number of results to return."
+  - location:
+      type: "QUERY_PARAMETER"
+      path: "/pets"
+      method: "GET"
+      name: "type"
+    properties:
+      description: "The type of pet to retrieve"
+  - location:
+      type: "RESPONSE"
+      method: "GET"
+      statusCode: "200"
+    properties:
+      description: "Successful operation"
+  - location:
+      type: "RESPONSE"
+      path: "/pets/{petId}"
+      method: "GET"
+      statusCode: "200"
+    properties:
+      description: "Successful operation"
+  - location:
+      type: "RESPONSE"
+      path: "/pets/{petId}"
+      method: "OPTIONS"
+      statusCode: "200"
+    properties:
+      description: "Successful operation"
+  - location:
+      type: "RESPONSE"
+      path: "/pets"
+      method: "GET"
+      statusCode: "200"
+    properties:
+      description: "Successful operation"
+  - location:
+      type: "RESPONSE"
+      path: "/pets"
+      method: "OPTIONS"
+      statusCode: "200"
+    properties:
+      description: "Successful operation"
+  - location:
+      type: "RESPONSE"
+      path: "/pets"
+      method: "POST"
+      statusCode: "200"
+    properties:
+      description: "Successful operation"
+  - location:
+      type: "RESPONSE_HEADER"
+      path: "/pets/{petId}"
+      method: "OPTIONS"
+      statusCode: "200"
+      name: "Access-Control-Allow-Headers"
+    properties:
+      description: "Used in response to a preflight request to indicate which HTTP\
+        \ headers can be used when making the request."
+  - location:
+      type: "RESPONSE_HEADER"
+      path: "/pets"
+      method: "OPTIONS"
+      statusCode: "200"
+      name: "Access-Control-Allow-Headers"
+    properties:
+      description: "Used in response to a preflight request to indicate which HTTP\
+        \ headers can be used when making the request."
+  - location:
+      type: "RESPONSE_HEADER"
+      path: "/pets/{petId}"
+      method: "OPTIONS"
+      statusCode: "200"
+      name: "Access-Control-Allow-Methods"
+    properties:
+      description: "Method or methods allowed when accessing the resource"
+  - location:
+      type: "RESPONSE_HEADER"
+      path: "/pets"
+      method: "OPTIONS"
+      statusCode: "200"
+      name: "Access-Control-Allow-Methods"
+    properties:
+      description: "Method or methods allowed when accessing the resource"
+  - location:
+      type: "RESPONSE_HEADER"
+      path: "/pets/{petId}"
+      method: "GET"
+      statusCode: "200"
+      name: "Access-Control-Allow-Origin"
+    properties:
+      description: "URI that may access the resource"
+  - location:
+      type: "RESPONSE_HEADER"
+      path: "/pets/{petId}"
+      method: "OPTIONS"
+      statusCode: "200"
+      name: "Access-Control-Allow-Origin"
+    properties:
+      description: "URI that may access the resource"
+  - location:
+      type: "RESPONSE_HEADER"
+      path: "/pets"
+      method: "GET"
+      statusCode: "200"
+      name: "Access-Control-Allow-Origin"
+    properties:
+      description: "URI that may access the resource"
+  - location:
+      type: "RESPONSE_HEADER"
+      path: "/pets"
+      method: "OPTIONS"
+      statusCode: "200"
+      name: "Access-Control-Allow-Origin"
+    properties:
+      description: "URI that may access the resource"
+  - location:
+      type: "RESPONSE_HEADER"
+      path: "/pets"
+      method: "POST"
+      statusCode: "200"
+      name: "Access-Control-Allow-Origin"
+    properties:
+      description: "URI that may access the resource"
+  - location:
+      type: "RESPONSE_HEADER"
+      method: "GET"
+      statusCode: "200"
+      name: "Content-Type"
+    properties:
+      description: "Media type of request"
